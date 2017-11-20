@@ -24,9 +24,9 @@ import java.util.List;
 /**
  * @author xingtianyu(code4j) Created on 2017-11-18.
  */
-public class Index {
+public class IndexHelper {
 
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(Index.class.getName());
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(IndexHelper.class.getName());
     private static Client client = ESearchClient.getClient();
 
     private static final int DEFAULT_RETRY_TIMES = 10;
@@ -46,7 +46,7 @@ public class Index {
         return IndexResult.buildResult(indexResponse);
     }
 
-    public static IndexResult update(String index, String type, IndexEntity entity){
+    public static IndexResult update(String index, IndexEntity entity){
         UpdateResponse updateResponse = builder.updateResponse(index,entity);
         String id = null;
         if (updateResponse != null) {
@@ -55,11 +55,11 @@ public class Index {
                 id = updateResponse.getId();
             }
         }
-        logger.info("UPDATE info to token={} type={} data={} result={}", index, type, entity.getSource(), id);
+        logger.info("UPDATE info to token={} type={} data={} result={}", index, entity.getType(), entity.getSource(), id);
         return IndexResult.buildResult(updateResponse);
     }
 
-    public static IndexResult upsert(String index, String type, IndexEntity entity){
+    public static IndexResult upsert(String index, IndexEntity entity){
         try {
             UpdateResponse updateResponse = builder.upsertResponse(index,entity);
             String id = null;
@@ -69,7 +69,7 @@ public class Index {
                     id = updateResponse.getId();
                 }
             }
-            logger.info("UPSERT info to token={} type={} data={} result={}", index, type, entity, id);
+            logger.info("UPSERT info to token={} type={} data={} result={}", index, entity.getType(), entity, id);
             return IndexResult.buildResult(updateResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,17 +77,17 @@ public class Index {
         return null;
     }
 
-    public static BulkResult bulkIndex(String index,String type,List<IndexEntity> entities){
+    public static BulkResult bulkIndex(String index,List<IndexEntity> entities){
         BulkResponse bulkResponse  = builder.prepareBulk(index,entities,BulkMode.INDEX);
         return BulkResult.buildResult(bulkResponse);
     }
 
-    public static BulkResult bulkUpdate(String index,String type,List<IndexEntity> entities){
+    public static BulkResult bulkUpdate(String index,List<IndexEntity> entities){
         BulkResponse bulkResponse  = builder.prepareBulk(index,entities,BulkMode.UPDATE);
         return BulkResult.buildResult(bulkResponse);
     }
 
-    public static BulkResult bulkUpsert(String index,String type,List<IndexEntity> entities){
+    public static BulkResult bulkUpsert(String index,List<IndexEntity> entities){
         BulkResponse bulkResponse  = builder.prepareBulk(index,entities,BulkMode.UPSERT);
         return BulkResult.buildResult(bulkResponse);
     }

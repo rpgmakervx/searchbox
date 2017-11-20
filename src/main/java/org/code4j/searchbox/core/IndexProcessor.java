@@ -5,16 +5,16 @@ import org.code4j.searchbox.annotation.Routing;
 import org.code4j.searchbox.annotation.Type;
 import org.code4j.searchbox.annotation.Version;
 import org.code4j.searchbox.core.index.IndexEntity;
-import org.code4j.searchbox.entity.IndexInfo;
 import org.code4j.searchbox.kits.JsonUtil;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author xingtianyu(code4j) Created on 2017-11-19.
  */
-public class IndexHandler {
+public class IndexProcessor<T> {
 
     /**
      * 解析自定义类，转换成索引要用的实体
@@ -22,7 +22,7 @@ public class IndexHandler {
      * @return
      * @throws Exception
      */
-    public IndexEntity handle(Object object) throws Exception {
+    public IndexEntity handle(T object) throws Exception {
         IndexEntity entity = new IndexEntity();
         String typeName = "";
         Type type = object.getClass().getAnnotation(Type.class);
@@ -44,6 +44,16 @@ public class IndexHandler {
         return entity;
     }
 
+    public List<IndexEntity> handleBulk(List<T> objs) throws Exception {
+        if (objs == null || objs.size() == 0){
+            return null;
+        }
+        List<IndexEntity> entities = new ArrayList<>();
+        for (T obj:objs){
+            entities.add(handle(obj));
+        }
+        return entities;
+    }
 
     private static void setId(Field field, Object delegate, IndexEntity entity) throws IllegalAccessException {
         Id id = field.getAnnotation(Id.class);
